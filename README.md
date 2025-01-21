@@ -63,28 +63,23 @@ Model konceptualny przedstawia **główne encje i relacje** bez uwzględnienia d
 
 ### **5.2. Model logiczny**   
 
-| **Funkcjonalność** | **Priorytet** | **Administrator** | **Artysta** | **Użytkownik** | **Uzasadnienie** | |-----------------|------------|----------------|-------------|-------------|----------------| | **CRUD na użytkownikach** | Wysoki | ✅ Pełen dostęp | ❌ Brak dostępu | ❌ Brak dostępu | Niezbędne do zarządzania kontami | 
-| **CRUD na utworach** | Wysoki | ✅ Pełen dostęp | ✅ Dodawanie/edycja (tylko własne) | ❌ Brak dostępu | Podstawa funkcjonowania aplikacji | 
-| **CRUD na albumach** | Wysoki | ✅ Pełen dostęp | ✅ Dodawanie/edycja (tylko własne) | ❌ Brak dostępu | Albumy muszą być zarządzane przez artystów | 
-| **CRUD na playlistach** | Średni | ✅ Pełen dostęp | ❌ Brak dostępu | ✅ Pełen dostęp | Playlisty zwiększają komfort użytkowania | 
-| **Odtwarzanie utworów** | Wysoki | ✅ Tak |❌ Brak dostępu | ✅ Tak | Kluczowa funkcjonalność aplikacji | 
-| **Polubienia (utwory, albumy, artyści)** | Średni | ✅ Tak | ❌ Brak dostępu | ✅ Tak | Personalizacja treści | 
-| **Zarządzanie subskrypcjami** | Wysoki | ✅ Tak | ❌ Brak dostępu | ✅ Tylko własna subskrypcja | Kluczowe dla modelu biznesowego |
- | **Statystyki odtwarzania** | Średni | ✅ Pełen dostęp | ✅ Tylko własne utwory | ❌ Brak dostępu | Przydatne dla artystów do analizy popularności |
-| **Wyszukiwanie utworów** | Wysoki | ✅ Pełen dostęp | ❌ Brak dostępu | ✅ Tak | Ułatwia dostęp do treści | 
+# Funkcjonalności i uprawnienia użytkowników
+
+# Funkcjonalności i uprawnienia użytkowników
+
+| Funkcjonalność                 | Priorytet | Administrator          | Artysta                      | Użytkownik                   | Uzasadnienie                                 |
+|--------------------------------|-----------|------------------------|------------------------------|------------------------------|---------------------------------------------|
+| CRUD na użytkownikach          | Wysoki    | ✅ Pełen dostęp        | ❌ Brak dostępu              | ❌ Brak dostępu              | Niezbędne do zarządzania kontami            |
+| CRUD na utworach               | Wysoki    | ✅ Pełen dostęp        | ✅ Dodawanie/edycja (tylko własne) | ❌ Brak dostępu          | Podstawa funkcjonowania aplikacji           |
+| CRUD na albumach               | Wysoki    | ✅ Pełen dostęp        | ✅ Dodawanie/edycja (tylko własne) | ❌ Brak dostępu          | Albumy muszą być zarządzane przez artystów  |
+| CRUD na playlistach            | Średni    | ✅ Pełen dostęp        | ❌ Brak dostępu              | ✅ Pełen dostęp              | Playlisty zwiększają komfort użytkowania    |
+| Odtwarzanie utworów            | Wysoki    | ✅ Tak                 | ❌ Brak dostępu              | ✅ Tak                       | Kluczowa funkcjonalność aplikacji           |
+| Polubienia (utwory, albumy, artyści) | Średni | ✅ Tak                 | ❌ Brak dostępu              | ✅ Tak                       | Personalizacja treści                       |
+| Zarządzanie subskrypcjami      | Wysoki    | ✅ Tak                 | ❌ Brak dostępu              | ✅ Tylko własna subskrypcja  | Kluczowe dla modelu biznesowego             |
+| Statystyki odtwarzania         | Średni    | ✅ Pełen dostęp        | ✅ Tylko własne utwory       | ❌ Brak dostępu              | Przydatne dla artystów do analizy popularności |
+| Wyszukiwanie utworów           | Wysoki    | ✅ Pełen dostęp        | ❌ Brak dostępu              | ✅ Tak                       | Ułatwia dostęp do treści                    |
 
 —
-
-
-
-
-
-
-
-
-
-
-
 
 ### **➢ Tabela `Users`**  
 a) **Encja**: Użytkownik  
