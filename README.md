@@ -76,7 +76,7 @@ Model konceptualny przedstawia **główne encje i relacje** bez uwzględnienia d
 | Odtwarzanie utworów            | Wysoki    | ✅ Tak                 | ❌ Brak dostępu              | ✅ Tak                       | Kluczowa funkcjonalność aplikacji           |
 | Polubienia (utwory, albumy, artyści) | Średni | ✅ Tak                 | ❌ Brak dostępu              | ✅ Tak                       | Personalizacja treści                       |
 | Zarządzanie subskrypcjami      | Wysoki    | ✅ Tak                 | ❌ Brak dostępu              | ✅ Tylko własna subskrypcja  | Kluczowe dla modelu biznesowego             |
-| Statystyki odtwarzania         | Średni    | ✅ Pełen dostęp        | ✅ Tylko własne utwory       | ❌ Brak dostępu              | Przydatne dla artystów do analizy popularności |
+| Statystyki odtwarzania         | Średni    | ✅ Pełen dostęp        | ✅ Tylko własne utwory (SELECT)      | ❌ Brak dostępu              | Przydatne dla artystów do analizy popularności |
 | Wyszukiwanie utworów           | Wysoki    | ✅ Pełen dostęp        | ❌ Brak dostępu              | ✅ Tak                       | Ułatwia dostęp do treści                    |
 
 —
