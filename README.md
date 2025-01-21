@@ -1,9 +1,9 @@
 # Projekt bazy danych dla aplikacji muzycznej w stylu Spotify - Sprawozdanie z realizacji projektu
 
-## Spis treści
+## 1. Spis treści
 
 - [Projekt bazy danych dla aplikacji muzycznej w stylu Spotify - Sprawozdanie z realizacji projektu](#projekt-bazy-danych-dla-aplikacji-muzycznej-w-stylu-spotify---sprawozdanie-z-realizacji-projektu)
-  - [Spis treści](#spis-treści)
+  - [1. Spis treści](#1-spis-treści)
   - [2. Wstęp](#2-wstęp)
   - [3. Analiza wymagań dla bazy danych aplikacji muzycznej](#3-analiza-wymagań-dla-bazy-danych-aplikacji-muzycznej)
   - [4. Model dziedziny i słowniki pojęciowe](#4-model-dziedziny-i-słowniki-pojęciowe)
