@@ -1,0 +1,10 @@
+name: spotifydb-env
+channels:
+  - defaults
+dependencies:
+  - python
+  - pip
+  - pip:
+    - mariadb
+    - python-dotenv
+    - bcrypt
