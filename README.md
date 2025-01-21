@@ -65,8 +65,6 @@ Model konceptualny przedstawia **główne encje i relacje** bez uwzględnienia d
 
 # Funkcjonalności i uprawnienia użytkowników
 
-# Funkcjonalności i uprawnienia użytkowników
-
 | Funkcjonalność                 | Priorytet | Administrator          | Artysta                      | Użytkownik                   | Uzasadnienie                                 |
 |--------------------------------|-----------|------------------------|------------------------------|------------------------------|---------------------------------------------|
 | CRUD na użytkownikach          | Wysoki    | ✅ Pełen dostęp        | ❌ Brak dostępu              | ❌ Brak dostępu              | Niezbędne do zarządzania kontami            |
