@@ -1,4 +1,5 @@
 import mysql.connector
+import logging
 
 def connect_to_db():
     try:
@@ -9,8 +10,8 @@ def connect_to_db():
             database="twoja_baza"    # Nazwa bazy danych
         )
         if connection.is_connected():
-            print("Połączono z bazą danych")
+            logging.info("Połączono z bazą danych")
             return connection
     except Exception as e:
-        print(f"Nie udało się połączyć z bazą: {e}")
+        logging.error(f"Nie udało się połączyć z bazą: {e}")
         return None

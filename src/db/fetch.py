@@ -1,4 +1,4 @@
-from src.utils.connect_db import connect_to_db
+from src.db.connect_db import connect_to_db
 
 def fetch_users():
     connection = connect_to_db()

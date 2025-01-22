@@ -1,4 +1,5 @@
-from src.utils.connect_db import connect_to_db
+from src.db.connect_db import connect_to_db
+import logging
 
 def add_user(username, email, hashed_password):
     connection = connect_to_db()
@@ -11,3 +12,4 @@ def add_user(username, email, hashed_password):
         connection.commit()
         cursor.close()
         connection.close()
+        logging.info(f"User {username} added successfully.")

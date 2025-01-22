@@ -40,6 +40,32 @@ conda env create -f environment.yml
 conda activate spotifydb-env
 ```
 
+### 1.4. Configure Environment Variables
+
+Create a `.env` file in the root directory and add your database connection details:
+
+```
+DB_HOST=localhost
+DB_USER=your_username
+DB_PASSWORD=your_password
+DB_NAME=your_database
+```
+
+### 1.5. Run the Database Script
+
+Run the database script to create the database schema:
+
+```bash
+mysql -u your_username -p your_database < database.sql
+```
+
+## 2. Usage
+
+To run the main application, use the following command:
+
+```bash
+python src/main.py
+```
 
 ## 3. Project Structure
 
@@ -51,9 +77,17 @@ spotify-database-project/
 ├── environment.yml
 ├── requirements.txt
 └── src/
-    ├── connect_db.py
-    └── utils/
-        └── encryption.py
+    ├── auth/
+    │   ├── authenticate_user.py
+    │   └── encryption.py
+    ├── db/
+    │   ├── connect_db.py
+    │   └── fetch.py
+    ├── handlers/
+    │   ├── data_handling.py
+    │   ├── execute_action.py
+    │   └── user_handler.py
+    └── main.py
 ```
 
 - `.env`: Environment variables for database connection.
@@ -62,5 +96,14 @@ spotify-database-project/
 - `environment.yml`: Conda environment configuration.
 - `requirements.txt`: Python dependencies.
 - `src/`: Source code directory.
-  - `connect_db.py`: Script to connect to the database.
-  - `utils/encryption.py`: Utility for password hashing.
+  - `auth/`: Authentication and encryption modules.
+    - `authenticate_user.py`: Handles user authentication.
+    - `encryption.py`: Utility for password hashing.
+  - `db/`: Database connection and fetching modules.
+    - `connect_db.py`: Script to connect to the database.
+    - `fetch.py`: Script to fetch data from the database.
+  - `handlers/`: Data handling and user input actions.
+    - `data_handling.py`: Handles data operations.
+    - `execute_action.py`: Handles user input actions.
+    - `user_handler.py`: Handles user-related database operations.
+  - `main.py`: Main entry point of the application.
