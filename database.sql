@@ -50,7 +50,6 @@ CREATE TABLE artists (
     -- Ograniczenia CHECK
     CONSTRAINT chk_artist_name_length CHECK (CHAR_LENGTH(name) >= 3), -- Minimalna długość nazwy artysty to 3 znaki
     CONSTRAINT chk_artist_name_not_empty CHECK (CHAR_LENGTH(TRIM(name)) > 0), -- Nazwa artysty nie może być pusta lub składać się tylko z białych znaków
-    CONSTRAINT chk_id_country_positive CHECK (id_country IS NULL OR id_country > 0), -- Identyfikator kraju musi być liczbą dodatnią lub NULL
 
     -- Klucz obcy z referencją do tabeli countries
     FOREIGN KEY (id_country) REFERENCES countries(id_country) ON DELETE SET NULL -- Jeśli kraj zostanie usunięty, id_country ustawia się na NULL
