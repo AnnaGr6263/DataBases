@@ -28,6 +28,15 @@ CREATE TABLE admins (
     CONSTRAINT chk_email_not_empty CHECK (CHAR_LENGTH(TRIM(email)) > 0) -- Adres e-mail nie może być pusty
 )ENGINE=InnoDB;
 
+CREATE TABLE countries (
+    id_country INT AUTO_INCREMENT PRIMARY KEY, -- Unikalny identyfikator kraju, klucz główny
+    name VARCHAR(50) NOT NULL UNIQUE, -- Unikalna nazwa kraju, nie może się powtarzać
+
+    -- Ograniczenia CHECK
+    CONSTRAINT chk_country_name_length CHECK (CHAR_LENGTH(name) >= 3), -- Minimalna długość nazwy kraju to 3 znaki
+    CONSTRAINT chk_country_name_not_empty CHECK (CHAR_LENGTH(TRIM(name)) > 0) -- Nazwa kraju nie może być pusta lub składać się tylko z białych znaków (spacji)
+)ENGINE=InnoDB;
+
 CREATE TABLE artists (
     id_artist INT AUTO_INCREMENT PRIMARY KEY, -- Unikalny identyfikator artysty, klucz główny
     name VARCHAR(100) NOT NULL UNIQUE, -- Unikalna nazwa artysty, nie może się powtarzać
@@ -42,15 +51,6 @@ CREATE TABLE artists (
 
     -- Klucz obcy z referencją do tabeli countries
     FOREIGN KEY (id_country) REFERENCES countries(id_country) ON DELETE SET NULL -- Jeśli kraj zostanie usunięty, id_country ustawia się na NULL
-)ENGINE=InnoDB;
-
-CREATE TABLE countries (
-    id_country INT AUTO_INCREMENT PRIMARY KEY, -- Unikalny identyfikator kraju, klucz główny
-    name VARCHAR(50) NOT NULL UNIQUE, -- Unikalna nazwa kraju, nie może się powtarzać
-
-    -- Ograniczenia CHECK
-    CONSTRAINT chk_country_name_length CHECK (CHAR_LENGTH(name) >= 3), -- Minimalna długość nazwy kraju to 3 znaki
-    CONSTRAINT chk_country_name_not_empty CHECK (CHAR_LENGTH(TRIM(name)) > 0) -- Nazwa kraju nie może być pusta lub składać się tylko z białych znaków (spacji)
 )ENGINE=InnoDB;
 
 CREATE TABLE genres (
