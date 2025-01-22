@@ -8,3 +8,4 @@ dependencies:
     - mariadb
     - python-dotenv
     - bcrypt
+    - mysql-connector-python
