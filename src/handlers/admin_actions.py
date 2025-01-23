@@ -1,6 +1,7 @@
 import logging
 from handlers.data_operations import fetch_data, add_data, update_data, delete_data, get_like_count
 from db.connect_db import connect_to_db
+from src.auth.encryption import hash_password  # Add this import
 
 def execute_admin_action(choice):
     if choice == "1":
@@ -26,5 +27,44 @@ def execute_admin_action(choice):
         likes = get_like_count(entity, entity_id)
         if likes is not None:
             print(f" {entity} with ID {entity_id} has {likes} likes.")
+    elif choice == "6":
+        username = input("Enter new username: ")
+        email = input("Enter new email: ")
+        password = input("Enter new password: ")
+        add_user(username, email, password)
+    elif choice == "7":
+        name = input("Enter artist name: ")
+        email = input("Enter artist email: ")
+        password = input("Enter artist password: ")
+        country_id = input("Enter country ID (optional): ")
+        add_artist(name, email, password, country_id)
     else:
         logging.error("Invalid choice. Please try again.")
+
+def add_user(username, email, password):
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    hashed_password = hash_password(password)  # Hash the password
+    try:
+        cursor.execute("INSERT INTO users (username, email, hashed_password) VALUES (?, ?, ?)", (username, email, hashed_password))
+        conn.commit()
+        logging.info(f"User {username} added successfully.")
+    except Exception as e:
+        logging.error(f"An error occurred while adding the user: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+def add_artist(name, email, password, country_id=None):
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    hashed_password = hash_password(password)  # Hash the password
+    try:
+        cursor.execute("INSERT INTO artists (name, email, hashed_password, id_country) VALUES (?, ?, ?, ?)", (name, email, hashed_password, country_id))
+        conn.commit()
+        logging.info(f"Artist {name} added successfully.")
+    except Exception as e:
+        logging.error(f"An error occurred while adding the artist: {e}")
+    finally:
+        cursor.close()
+        conn.close()

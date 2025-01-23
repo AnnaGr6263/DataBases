@@ -79,9 +79,11 @@ def admin_menu():
         print("3. Update data")
         print("4. Delete data")
         print("5. Check likes")
-        print("6. Exit")
+        print("6. Add user")
+        print("7. Add artist")  # Add this option
+        print("8. Exit")  # Update exit option number
 
-        choice = input("Enter your choice (1-6): ")
+        choice = input("Enter your choice (1-8): ")
 
         if choice == "5":
             entity = input("Enter type (song/album/artist): ").strip().lower()
@@ -90,7 +92,7 @@ def admin_menu():
             if likes is not None:
                 print(f" {entity} with ID {entity_id} has {likes} likes.")
 
-        if choice == "6":
+        if choice == "8":
             logging.info("Exiting admin menu. Goodbye!")
             break
 
