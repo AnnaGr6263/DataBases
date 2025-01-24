@@ -1,12 +1,16 @@
-from src.auth.authenticate_user import authenticate_user
-from src.handlers.user_actions import execute_user_action
-from src.handlers.artist_actions import execute_artist_action
-from src.handlers.admin_actions import execute_admin_action
-from src.handlers.data_operations import get_like_count
-from src.db.setup_db import setup_database
+from auth.authenticate_user import authenticate_user
+from handlers.user_actions import execute_user_action
+from handlers.artist_actions import execute_artist_action
+from handlers.admin_actions import execute_admin_action
+from handlers.data_operations import get_like_count
+from db.setup_db import setup_database
+import mariadb
 import logging
+from dotenv import load_dotenv
+import os
 
 def main():
+    load_dotenv()  # Load environment variables from .env file
     logging.basicConfig(level=logging.INFO)
     logging.info("Welcome to the Database Manager!")
 
@@ -35,7 +39,13 @@ def main():
         username = input("Enter your username: ")
         password = input("Enter your password: ")
 
-        if not authenticate_user(username, password):
+        user_type = 'user'
+        if login_choice == "2":
+            user_type = 'admin'
+        elif login_choice == "3":
+            user_type = 'artist'
+
+        if not authenticate_user(username, password, user_type):
             logging.error("Invalid credentials. Please try again.")
             continue
 

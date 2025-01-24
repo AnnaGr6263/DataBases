@@ -1,17 +1,18 @@
-import mysql.connector
+import mariadb
 import logging
+import os
 
 def connect_to_db():
     try:
-        connection = mysql.connector.connect(
-            host="localhost",        # Nazwa hosta, np. 'localhost' lub IP
-            user="twoja_nazwa_uzytkownika",  # Nazwa użytkownika
-            password="twoje_haslo",  # Hasło użytkownika
-            database="twoja_baza"    # Nazwa bazy danych
+        connection = mariadb.connect(
+            host=os.getenv("DB_HOST", "localhost"),        # Nazwa hosta, np. 'localhost' lub IP
+            user=os.getenv("DB_USER", "root"),  # Nazwa użytkownika
+            password=os.getenv("DB_PASSWORD", ""),  # Hasło użytkownika
+            database=os.getenv("DB_NAME", "spotifydb")    # Nazwa bazy danych
         )
-        if connection.is_connected():
+        if connection:
             logging.info("Połączono z bazą danych")
             return connection
-    except Exception as e:
+    except mariadb.Error as e:
         logging.error(f"Nie udało się połączyć z bazą: {e}")
         return None

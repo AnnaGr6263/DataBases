@@ -107,3 +107,92 @@ spotify-database-project/
     - `execute_action.py`: Handles user input actions.
     - `user_handler.py`: Handles user-related database operations.
   - `main.py`: Main entry point of the application.
+
+# Database Manager
+
+## Overview
+This project is a database manager for a music application. It allows users, admins, and artists to interact with the database to perform various actions such as viewing songs, managing playlists, and more.
+
+## Setup
+
+### Prerequisites
+- Python 3.x
+- MariaDB
+- `pip` (Python package installer)
+
+### Installation
+
+1. **Clone the repository:**
+    ```bash
+    git clone https://github.com/yourusername/databasemanager.git
+    cd databasemanager
+    ```
+
+2. **Create a virtual environment:**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+    ```
+
+3. **Install the required packages:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. **Set up the environment variables:**
+    - Create a `.env` file in the root directory of the project.
+    - Copy the contents of `.env.example` into `.env` and update the values as needed.
+    ```bash
+    cp .env.example .env
+    ```
+
+    Update the `.env` file with your database credentials:
+    ```properties
+    DB_HOST=localhost
+    DB_USER=root
+    DB_PASSWORD=yourpassword
+    DB_NAME=spotifydb
+    ```
+
+### Running the Application
+
+1. **Start the application:**
+    ```bash
+    python src/main.py
+    ```
+
+2. **Follow the prompts to log in as a user, admin, or artist and perform various actions.**
+
+### Project Structure
+
+```
+.
+├── src
+│   ├── auth
+│   │   ├── authenticate_user.py
+│   │   └── encryption.py
+│   ├── db
+│   │   ├── connect_db.py
+│   │   ├── fetch.py
+│   │   └── setup_db.py
+│   ├── handlers
+│   │   ├── admin_actions.py
+│   │   ├── artist_actions.py
+│   │   ├── data_operations.py
+│   │   └── user_actions.py
+│   └── main.py
+├── .env
+├── .env.example
+├── .gitignore
+└── README.md
+```
+
+### Notes
+
+- Ensure that your MariaDB server is running and accessible with the credentials provided in the `.env` file.
+- The `setup_database` function in `setup_db.py` will automatically create necessary indexes and functions in the database, and create the first admin user if it doesn't exist.
+
+### Troubleshooting
+
+- If you encounter any issues connecting to the database, check the credentials in your `.env` file and ensure that the MariaDB server is running.
+- For any other issues, refer to the logs for detailed error messages.

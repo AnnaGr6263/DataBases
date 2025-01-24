@@ -1,6 +1,6 @@
 from db.connect_db import connect_to_db
 import logging
-from src.auth.encryption import hash_password  # Add this import
+from auth.encryption import hash_password  # Add this import
 
 def create_indexes():
     # Tworzy indeksy w bazie dla szybszego wyszukiwania.
@@ -72,6 +72,7 @@ def setup_database():
         # Check if the first admin exists
         cursor.execute("SELECT COUNT(*) FROM admins WHERE username = 'admin'")
         admin_exists = cursor.fetchone()[0]
+        logging.info(f"Admin exists: {admin_exists}")
 
         if admin_exists == 0:
             # Insert the first admin
@@ -79,7 +80,8 @@ def setup_database():
             first_admin_email = "admin@example.com"
             first_admin_password = "adminpassword"
             hashed_password = hash_password(first_admin_password)
-            
+            logging.info(f"Creating admin user with username: {first_admin_username}, email: {first_admin_email}")
+
             cursor.execute("""
                 INSERT INTO admins (username, email, hashed_password)
                 VALUES (%s, %s, %s)
