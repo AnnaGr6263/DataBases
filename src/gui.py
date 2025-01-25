@@ -243,46 +243,46 @@ class DatabaseManagerApp(QWidget):
                 self.form_layout.addRow("Name:", QLineEdit())
                 self.form_layout.addRow("Email:", QLineEdit())
                 self.form_layout.addRow("Password:", QLineEdit())
-                self.form_layout.addRow("Country ID:", QLineEdit())
+                self.form_layout.addRow("Country:", QLineEdit())  # Changed to ask for country name
             elif table_name == "genres":
                 self.form_layout.addRow("Name:", QLineEdit())
             elif table_name == "albums":
                 self.form_layout.addRow("Title:", QLineEdit())
-                self.form_layout.addRow("Artist ID:", QLineEdit())
-                self.form_layout.addRow("Genre ID:", QLineEdit())
+                self.form_layout.addRow("Artist:", QLineEdit())  # Changed to ask for artist name
+                self.form_layout.addRow("Genre:", QLineEdit())  # Changed to ask for genre name
                 self.form_layout.addRow("Release Year:", QLineEdit())
             elif table_name == "songs":
                 self.form_layout.addRow("Title:", QLineEdit())
                 self.form_layout.addRow("Duration:", QLineEdit())
-                self.form_layout.addRow("Album ID:", QLineEdit())
-                self.form_layout.addRow("Genre ID:", QLineEdit())
+                self.form_layout.addRow("Album:", QLineEdit())  # Changed to ask for album title
+                self.form_layout.addRow("Genre:", QLineEdit())  # Changed to ask for genre name
             elif table_name == "playlists":
                 self.form_layout.addRow("Name:", QLineEdit())
-                self.form_layout.addRow("User ID:", QLineEdit())
+                self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
                 self.form_layout.addRow("Is Public:", QLineEdit())
             elif table_name == "playlist_songs":
-                self.form_layout.addRow("Playlist ID:", QLineEdit())
-                self.form_layout.addRow("Song ID:", QLineEdit())
+                self.form_layout.addRow("Playlist:", QLineEdit())  # Changed to ask for playlist name
+                self.form_layout.addRow("Song:", QLineEdit())  # Changed to ask for song title
             elif table_name == "subscriptions":
-                self.form_layout.addRow("User ID:", QLineEdit())
+                self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
                 self.form_layout.addRow("Start Date:", QLineEdit())
                 self.form_layout.addRow("End Date:", QLineEdit())
             elif table_name == "song_stats":
-                self.form_layout.addRow("Song ID:", QLineEdit())
+                self.form_layout.addRow("Song:", QLineEdit())  # Changed to ask for song title
                 self.form_layout.addRow("Play Count:", QLineEdit())
                 self.form_layout.addRow("Last Played:", QLineEdit())
             elif table_name == "song_likes":
-                self.form_layout.addRow("User ID:", QLineEdit())
-                self.form_layout.addRow("Song ID:", QLineEdit())
+                self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
+                self.form_layout.addRow("Song:", QLineEdit())  # Changed to ask for song title
             elif table_name == "album_likes":
-                self.form_layout.addRow("User ID:", QLineEdit())
-                self.form_layout.addRow("Album ID:", QLineEdit())
+                self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
+                self.form_layout.addRow("Album:", QLineEdit())  # Changed to ask for album title
             elif table_name == "artist_likes":
-                self.form_layout.addRow("User ID:", QLineEdit())
-                self.form_layout.addRow("Artist ID:", QLineEdit())
+                self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
+                self.form_layout.addRow("Artist:", QLineEdit())  # Changed to ask for artist name
             elif table_name == "admin_created_playlists":
-                self.form_layout.addRow("Playlist ID:", QLineEdit())
-                self.form_layout.addRow("Admin ID:", QLineEdit())
+                self.form_layout.addRow("Playlist:", QLineEdit())  # Changed to ask for playlist name
+                self.form_layout.addRow("Admin:", QLineEdit())  # Changed to ask for admin username
 
         table_combo.currentTextChanged.connect(update_form_fields)
         update_form_fields(table_combo.currentText())
@@ -320,12 +320,13 @@ class DatabaseManagerApp(QWidget):
 
         row = selected_items[0].row()
         record_id = self.table_widget.item(row, 0).text()  # Assuming the first column is the ID
-        table_name = self.table_buttons[self.table_widget.currentIndex().row()]
+        table_name = self.current_table_name  # Use the current table name
 
         execute_admin_action("4", table_name, record_id)
         self.load_table_data(table_name)
 
     def load_table_data(self, table_name):
+        self.current_table_name = table_name  # Store the current table name
         connection = connect_to_db()
         if connection:
             cursor = connection.cursor()

@@ -46,7 +46,7 @@ CREATE TABLE artists (
     date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Data utworzenia konta artysty
 
     -- Ograniczenia CHECK
-    CONSTRAINT chk_artist_name_length CHECK (CHAR_LENGTH(name) >= 3), -- Minimalna długość nazwy artysty to 3 znaki
+    CONSTRAINT chk_artist_name_length CHECK (CHAR_LENGTH(name) >= 2), -- Minimalna długość nazwy artysty to 3 znaki
     CONSTRAINT chk_artist_name_not_empty CHECK (CHAR_LENGTH(TRIM(name)) > 0), -- Nazwa artysty nie może być pusta lub składać się tylko z białych znaków
 
     -- Klucz obcy z referencją do tabeli countries
@@ -209,3 +209,16 @@ CREATE TABLE admin_created_playlists (
     FOREIGN KEY (id_playlist) REFERENCES playlists(id_playlist) ON DELETE CASCADE, -- Jeśli playlista zostanie usunięta, usunięte zostanie też powiązanie z administratorem
     FOREIGN KEY (id_admin) REFERENCES admins(id_admin) ON DELETE CASCADE -- Jeśli administrator zostanie usunięty, usunięte zostanie też jego powiązanie z playlistą
 )ENGINE=InnoDB;
+
+DELIMITER //
+
+CREATE TRIGGER after_user_insert
+AFTER INSERT ON users
+FOR EACH ROW
+BEGIN
+    DECLARE end_date DATE;
+    SET end_date = DATE_ADD(NEW.date_created, INTERVAL 3 MONTH);
+    INSERT INTO subscriptions (id_user, start_date, end_date) VALUES (NEW.id_user, NEW.date_created, end_date);
+END //
+
+DELIMITER ;
