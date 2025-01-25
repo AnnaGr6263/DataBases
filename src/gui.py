@@ -4,7 +4,7 @@ from auth.authenticate_user import authenticate_user
 from handlers.user_actions import execute_user_action
 from handlers.artist_actions import execute_artist_action
 from handlers.admin_actions import execute_admin_action
-from handlers.data_operations import get_like_count
+from handlers.data_operations import get_like_count, add_data
 from db.setup_db import setup_database
 from db.connect_db import connect_to_db
 import logging
@@ -204,8 +204,113 @@ class DatabaseManagerApp(QWidget):
         self.load_table_data(self.table_buttons[0])  # Load the first table by default
 
     def add_data(self):
-        # TODO: Implement add_data functionality
-        pass
+        add_dialog = QDialog(self)
+        add_dialog.setWindowTitle("Add Data")
+        add_dialog.setGeometry(100, 100, 400, 300)
+
+        layout = QVBoxLayout()
+
+        table_label = QLabel("Select table to add data:")
+        layout.addWidget(table_label)
+
+        table_combo = QComboBox()
+        table_combo.addItems([
+            "users", "admins", "countries", "artists", "genres", "albums", "songs", "playlists",
+            "playlist_songs", "subscriptions", "song_stats", "song_likes", "album_likes", "artist_likes", "admin_created_playlists"
+        ])
+        layout.addWidget(table_combo)
+
+        self.form_layout = QFormLayout()
+        layout.addLayout(self.form_layout)
+
+        def update_form_fields(table_name):
+            while self.form_layout.count():
+                child = self.form_layout.takeAt(0)
+                if child.widget():
+                    child.widget().deleteLater()
+
+            if table_name == "users":
+                self.form_layout.addRow("Username:", QLineEdit())
+                self.form_layout.addRow("Email:", QLineEdit())
+                self.form_layout.addRow("Password:", QLineEdit())
+            elif table_name == "admins":
+                self.form_layout.addRow("Username:", QLineEdit())
+                self.form_layout.addRow("Email:", QLineEdit())
+                self.form_layout.addRow("Password:", QLineEdit())
+            elif table_name == "countries":
+                self.form_layout.addRow("Name:", QLineEdit())
+            elif table_name == "artists":
+                self.form_layout.addRow("Name:", QLineEdit())
+                self.form_layout.addRow("Email:", QLineEdit())
+                self.form_layout.addRow("Password:", QLineEdit())
+                self.form_layout.addRow("Country ID:", QLineEdit())
+            elif table_name == "genres":
+                self.form_layout.addRow("Name:", QLineEdit())
+            elif table_name == "albums":
+                self.form_layout.addRow("Title:", QLineEdit())
+                self.form_layout.addRow("Artist ID:", QLineEdit())
+                self.form_layout.addRow("Genre ID:", QLineEdit())
+                self.form_layout.addRow("Release Year:", QLineEdit())
+            elif table_name == "songs":
+                self.form_layout.addRow("Title:", QLineEdit())
+                self.form_layout.addRow("Duration:", QLineEdit())
+                self.form_layout.addRow("Album ID:", QLineEdit())
+                self.form_layout.addRow("Genre ID:", QLineEdit())
+            elif table_name == "playlists":
+                self.form_layout.addRow("Name:", QLineEdit())
+                self.form_layout.addRow("User ID:", QLineEdit())
+                self.form_layout.addRow("Is Public:", QLineEdit())
+            elif table_name == "playlist_songs":
+                self.form_layout.addRow("Playlist ID:", QLineEdit())
+                self.form_layout.addRow("Song ID:", QLineEdit())
+            elif table_name == "subscriptions":
+                self.form_layout.addRow("User ID:", QLineEdit())
+                self.form_layout.addRow("Start Date:", QLineEdit())
+                self.form_layout.addRow("End Date:", QLineEdit())
+            elif table_name == "song_stats":
+                self.form_layout.addRow("Song ID:", QLineEdit())
+                self.form_layout.addRow("Play Count:", QLineEdit())
+                self.form_layout.addRow("Last Played:", QLineEdit())
+            elif table_name == "song_likes":
+                self.form_layout.addRow("User ID:", QLineEdit())
+                self.form_layout.addRow("Song ID:", QLineEdit())
+            elif table_name == "album_likes":
+                self.form_layout.addRow("User ID:", QLineEdit())
+                self.form_layout.addRow("Album ID:", QLineEdit())
+            elif table_name == "artist_likes":
+                self.form_layout.addRow("User ID:", QLineEdit())
+                self.form_layout.addRow("Artist ID:", QLineEdit())
+            elif table_name == "admin_created_playlists":
+                self.form_layout.addRow("Playlist ID:", QLineEdit())
+                self.form_layout.addRow("Admin ID:", QLineEdit())
+
+        table_combo.currentTextChanged.connect(update_form_fields)
+        update_form_fields(table_combo.currentText())
+
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        button_box.accepted.connect(lambda: self.submit_add_data(table_combo.currentText(), self.form_layout))
+        button_box.rejected.connect(add_dialog.reject)
+        layout.addWidget(button_box)
+
+        add_dialog.setLayout(layout)
+        add_dialog.exec_()
+
+    def submit_add_data(self, table_name, form_layout):
+        data = {}
+        for i in range(form_layout.rowCount()):
+            label_item = form_layout.itemAt(i, QFormLayout.LabelRole)
+            field_item = form_layout.itemAt(i, QFormLayout.FieldRole)
+            if label_item and field_item:
+                label = label_item.widget().text().replace(":", "")
+                value = field_item.widget().text()
+                if label.lower() == "password":
+                    label = "hashed_password"
+                    value = hash_password(value)
+                data[label] = value
+
+        add_data(table_name, data)
+        self.load_table_data(table_name)
+        print(f"Adding data to {table_name}: {data}")
 
     def delete_data(self):
         selected_items = self.table_widget.selectedItems()

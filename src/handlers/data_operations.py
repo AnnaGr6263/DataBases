@@ -12,7 +12,23 @@ def fetch_data(table_name):
         return result
 
 def add_data(table_name, data):
-    pass  # Remove add_data functionality
+    connection = connect_to_db()
+    if connection:
+        cursor = connection.cursor()
+        try:
+            # Convert form labels to match database column names
+            data = {key.lower().replace(' ', '_'): value for key, value in data.items()}
+            columns = ', '.join(data.keys())
+            placeholders = ', '.join(['%s'] * len(data))
+            sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+            cursor.execute(sql, list(data.values()))
+            connection.commit()
+            logging.info(f"Data added to {table_name} successfully.")
+        except Exception as e:
+            logging.error(f"Error adding data to {table_name}: {e}")
+        finally:
+            cursor.close()
+            connection.close()
 
 def update_data(table_name, record_id, data):
     connection = connect_to_db()
