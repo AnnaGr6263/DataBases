@@ -9,3 +9,4 @@ dependencies:
     - python-dotenv
     - bcrypt
     - mysql-connector-python
+    - PyQT5

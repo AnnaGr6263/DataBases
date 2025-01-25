@@ -12,17 +12,7 @@ def fetch_data(table_name):
         return result
 
 def add_data(table_name, data):
-    connection = connect_to_db()
-    if connection:
-        cursor = connection.cursor()
-        placeholders = ', '.join(['%s'] * len(data))
-        columns = ', '.join(data.keys())
-        sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-        cursor.execute(sql, list(data.values()))
-        connection.commit()
-        cursor.close()
-        connection.close()
-        logging.info(f"Data added to {table_name} successfully.")
+    pass  # Remove add_data functionality
 
 def update_data(table_name, record_id, data):
     connection = connect_to_db()
@@ -40,12 +30,18 @@ def delete_data(table_name, record_id):
     connection = connect_to_db()
     if connection:
         cursor = connection.cursor()
-        sql = f"DELETE FROM {table_name} WHERE id = %s"
-        cursor.execute(sql, (record_id,))
-        connection.commit()
-        cursor.close()
-        connection.close()
-        logging.info(f"Data from {table_name} deleted successfully.")
+        try:
+            # Determine the primary key column name based on the table name
+            primary_key_column = f"id_{table_name[:-1]}"  # Remove the trailing 's' and prepend 'id_'
+            sql = f"DELETE FROM {table_name} WHERE {primary_key_column} = %s"
+            cursor.execute(sql, (record_id,))
+            connection.commit()
+            logging.info(f"Data from {table_name} deleted successfully.")
+        except Exception as e:
+            logging.error(f"Error deleting data from {table_name}: {e}")
+        finally:
+            cursor.close()
+            connection.close()
 
 def get_like_count(entity_type, entity_id):
     # Zwraca liczbę polubień dla utworu, albumu lub artysty.
