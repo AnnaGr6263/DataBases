@@ -11,7 +11,7 @@ def connect_to_db():
             database=os.getenv("DB_NAME", "spotifydb")    # Nazwa bazy danych
         )
         if connection:
-            logging.info("Połączono z bazą danych")
+            logging.debug("Połączono z bazą danych")
             return connection
     except mariadb.Error as e:
         logging.error(f"Nie udało się połączyć z bazą: {e}")
