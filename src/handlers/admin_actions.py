@@ -1,7 +1,7 @@
 import logging
-from handlers.data_operations import fetch_data, update_data, delete_data, get_like_count
-from db.connect_db import connect_to_db
-from auth.encryption import hash_password  # Add this import
+from src.handlers.data_operations import fetch_data, update_data, delete_data, get_like_count
+from src.db.connect_db import connect_to_db
+from src.auth.encryption import hash_password  # Add this import
 
 def execute_admin_action(choice, table_name=None, data=None):
     if choice == "1":

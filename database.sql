@@ -210,6 +210,7 @@ CREATE TABLE admin_created_playlists (
     FOREIGN KEY (id_admin) REFERENCES admins(id_admin) ON DELETE CASCADE -- Jeśli administrator zostanie usunięty, usunięte zostanie też jego powiązanie z playlistą
 )ENGINE=InnoDB;
 
+
 DELIMITER //
 
 CREATE TRIGGER after_user_insert

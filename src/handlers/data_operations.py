@@ -1,5 +1,5 @@
 import logging
-from db.connect_db import connect_to_db
+from src.db.connect_db import connect_to_db
 
 def fetch_data(table_name):
     connection = connect_to_db()

@@ -1,5 +1,5 @@
-from db.fetch import fetch_users, fetch_admins
-from auth.encryption import hash_password
+from src.db.fetch import fetch_users, fetch_admins
+from src.auth.encryption import hash_password
 import bcrypt
 import logging
 

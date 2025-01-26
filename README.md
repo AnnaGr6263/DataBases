@@ -143,7 +143,7 @@ This project is a database manager for a music application. It allows users, adm
     - Create a `.env` file in the root directory of the project.
     - Copy the contents of `.env.example` into `.env` and update the values as needed.
     ```bash
-    cp .env.example .env
+    cp .env .env
     ```
 
     Update the `.env` file with your database credentials:

@@ -1,5 +1,5 @@
 import logging
-from handlers.data_operations import fetch_data
+from src.handlers.data_operations import fetch_data
 
 def execute_user_action(choice, username):
     if choice == "1":
