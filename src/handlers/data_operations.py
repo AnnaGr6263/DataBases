@@ -1,15 +1,21 @@
 import logging
-from src.db.connect_db import connect_to_db
+from db.connect_db import connect_to_db
 
 def fetch_data(table_name):
     connection = connect_to_db()
     if connection:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute(f"SELECT * FROM {table_name}")
-        result = cursor.fetchall()
-        cursor.close()
-        connection.close()
-        return result
+        try:
+            cursor.execute(f"SELECT * FROM {table_name}")
+            result = cursor.fetchall()
+            logging.info(f"Fetched data from {table_name}: {result}")
+            return result
+        except Exception as e:
+            logging.error(f"Error fetching data from {table_name}: {e}")
+            return []
+        finally:
+            cursor.close()
+            connection.close()
 
 def get_singular_form(table_name):
     if table_name.endswith('ies'):

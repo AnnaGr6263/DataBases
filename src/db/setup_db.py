@@ -1,6 +1,6 @@
-from src.db.connect_db import connect_to_db
+from db.connect_db import connect_to_db
 import logging
-from src.auth.encryption import hash_password  # Add this import
+from auth.encryption import hash_password  # Add this import
 
 def create_indexes():
     # Tworzy indeksy w bazie dla szybszego wyszukiwania.

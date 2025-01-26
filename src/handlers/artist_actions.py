@@ -1,5 +1,5 @@
 import logging
-from src.handlers.data_operations import fetch_data, add_data, update_data, delete_data
+from handlers.data_operations import fetch_data, add_data, update_data, delete_data
 
 def add_song(artist_id, title, duration, album_id, genre_id):
     data = {

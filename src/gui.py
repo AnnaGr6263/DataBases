@@ -115,7 +115,7 @@ class DatabaseManagerApp(QWidget):
             button = QPushButton(table.replace('_', ' ').capitalize(), manage_window)
             button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)  # Make buttons expand vertically
             button.setFixedWidth(125)  # Set fixed width for buttons
-            button.clicked.connect(lambda _, t=table: self.load_table_data(t))
+            button.clicked.connect(lambda _, t=table: self.load_table_data(t, username))
             side_button_layout.addWidget(button)
 
         table_layout.addLayout(side_button_layout, 1)  # Add side button layout with stretch factor 1
@@ -131,7 +131,7 @@ class DatabaseManagerApp(QWidget):
         manage_window.show()
         self.menu_windows.append(manage_window)  # Keep reference
 
-        self.load_table_data(self.table_buttons[0])  # Load the first table by default
+        self.load_table_data(self.table_buttons[0], username)  # Load the first table by default
 
     def admin_menu(self):
         self.manage_data()  # Skip directly to the tables view
@@ -203,92 +203,109 @@ class DatabaseManagerApp(QWidget):
 
         self.load_table_data(self.table_buttons[0])  # Load the first table by default
 
-    def add_data(self):
+    def add_data(self, table_name=None, skip_table_choice=False):
         add_dialog = QDialog(self)
         add_dialog.setWindowTitle("Add Data")
         add_dialog.setGeometry(100, 100, 400, 300)
 
         layout = QVBoxLayout()
 
-        table_label = QLabel("Select table to add data:")
-        layout.addWidget(table_label)
+        if skip_table_choice:
+            # Skip table field and forcibly use current_table_name
+            current_table = table_name
+        else:
+            table_label = QLabel("Select table to add data:")
+            layout.addWidget(table_label)
 
-        table_combo = QComboBox()
-        table_combo.addItems([
-            "users", "admins", "countries", "artists", "genres", "albums", "songs", "playlists",
-            "playlist_songs", "subscriptions", "song_stats", "song_likes", "album_likes", "artist_likes", "admin_created_playlists"
-        ])
-        layout.addWidget(table_combo)
+            table_combo = QComboBox()
+            table_combo.addItems([
+                "users", "admins", "countries", "artists", "genres", "albums", "songs", "playlists",
+                "playlist_songs", "subscriptions", "song_stats", "song_likes", "album_likes", "artist_likes", "admin_created_playlists"
+            ])
+            layout.addWidget(table_combo)
+
+            if table_name:
+                table_combo.setCurrentText(table_name)
+                table_combo.setEnabled(False)
+
+            current_table = table_combo.currentText()
 
         self.form_layout = QFormLayout()
         layout.addLayout(self.form_layout)
 
-        def update_form_fields(table_name):
+        self.success_label = QLabel("")
+        layout.addWidget(self.success_label)
+
+        def update_form_fields(table):
             while self.form_layout.count():
                 child = self.form_layout.takeAt(0)
                 if child.widget():
                     child.widget().deleteLater()
 
-            if table_name == "users":
+            if table == "users":
                 self.form_layout.addRow("Username:", QLineEdit())
                 self.form_layout.addRow("Email:", QLineEdit())
                 self.form_layout.addRow("Password:", QLineEdit())
-            elif table_name == "admins":
+            elif table == "admins":
                 self.form_layout.addRow("Username:", QLineEdit())
                 self.form_layout.addRow("Email:", QLineEdit())
                 self.form_layout.addRow("Password:", QLineEdit())
-            elif table_name == "countries":
+            elif table == "countries":
                 self.form_layout.addRow("Name:", QLineEdit())
-            elif table_name == "artists":
+            elif table == "artists":
                 self.form_layout.addRow("Name:", QLineEdit())
                 self.form_layout.addRow("Email:", QLineEdit())
                 self.form_layout.addRow("Password:", QLineEdit())
                 self.form_layout.addRow("Country:", QLineEdit())  # Changed to ask for country name
-            elif table_name == "genres":
+            elif table == "genres":
                 self.form_layout.addRow("Name:", QLineEdit())
-            elif table_name == "albums":
+            elif table == "albums":
                 self.form_layout.addRow("Title:", QLineEdit())
-                self.form_layout.addRow("Artist:", QLineEdit())  # Changed to ask for artist name
+                if not skip_table_choice:
+                    self.form_layout.addRow("Artist:", QLineEdit())  # Changed to ask for artist name
                 self.form_layout.addRow("Genre:", QLineEdit())  # Changed to ask for genre name
                 self.form_layout.addRow("Release Year:", QLineEdit())
-            elif table_name == "songs":
+            elif table == "songs":
                 self.form_layout.addRow("Title:", QLineEdit())
                 self.form_layout.addRow("Duration:", QLineEdit())
                 self.form_layout.addRow("Album:", QLineEdit())  # Changed to ask for album title
                 self.form_layout.addRow("Genre:", QLineEdit())  # Changed to ask for genre name
-            elif table_name == "playlists":
+            elif table == "playlists":
                 self.form_layout.addRow("Name:", QLineEdit())
                 self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
                 self.form_layout.addRow("Is Public:", QLineEdit())
-            elif table_name == "playlist_songs":
+            elif table == "playlist_songs":
                 self.form_layout.addRow("Playlist:", QLineEdit())  # Changed to ask for playlist name
                 self.form_layout.addRow("Song:", QLineEdit())  # Changed to ask for song title
-            elif table_name == "subscriptions":
+            elif table == "subscriptions":
                 self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
                 self.form_layout.addRow("Start Date:", QLineEdit())
                 self.form_layout.addRow("End Date:", QLineEdit())
-            elif table_name == "song_stats":
+            elif table == "song_stats":
                 self.form_layout.addRow("Song:", QLineEdit())  # Changed to ask for song title
                 self.form_layout.addRow("Play Count:", QLineEdit())
                 self.form_layout.addRow("Last Played:", QLineEdit())
-            elif table_name == "song_likes":
+            elif table == "song_likes":
                 self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
                 self.form_layout.addRow("Song:", QLineEdit())  # Changed to ask for song title
-            elif table_name == "album_likes":
+            elif table == "album_likes":
                 self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
                 self.form_layout.addRow("Album:", QLineEdit())  # Changed to ask for album title
-            elif table_name == "artist_likes":
+            elif table == "artist_likes":
                 self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
                 self.form_layout.addRow("Artist:", QLineEdit())  # Changed to ask for artist name
-            elif table_name == "admin_created_playlists":
+            elif table == "admin_created_playlists":
                 self.form_layout.addRow("Playlist:", QLineEdit())  # Changed to ask for playlist name
                 self.form_layout.addRow("Admin:", QLineEdit())  # Changed to ask for admin username
 
-        table_combo.currentTextChanged.connect(update_form_fields)
-        update_form_fields(table_combo.currentText())
+        if not skip_table_choice:
+            table_combo.currentTextChanged.connect(update_form_fields)
+            update_form_fields(table_combo.currentText())
+        else:
+            update_form_fields(current_table)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        button_box.accepted.connect(lambda: self.submit_add_data(table_combo.currentText(), self.form_layout))
+        button_box.accepted.connect(lambda: self.submit_add_data(current_table, self.form_layout))
         button_box.rejected.connect(add_dialog.reject)
         layout.addWidget(button_box)
 
@@ -308,8 +325,13 @@ class DatabaseManagerApp(QWidget):
                     value = hash_password(value)
                 data[label] = value
 
+        # If artist is adding data for "albums" or "songs" and the form has no "Artist", fill it automatically
+        if table_name in ["albums", "songs"] and "Artist" not in data:
+            data["Artist"] = self.username_entry.text()
+
         add_data(table_name, data)
         self.load_table_data(table_name)
+        self.success_label.setText("Data added successfully!")
         print(f"Adding data to {table_name}: {data}")
 
     def delete_data(self):
@@ -325,15 +347,31 @@ class DatabaseManagerApp(QWidget):
         execute_admin_action("4", table_name, record_id)
         self.load_table_data(table_name)
 
-    def load_table_data(self, table_name):
+    def load_table_data(self, table_name, username=None):
         self.current_table_name = table_name  # Store the current table name
         connection = connect_to_db()
         if connection:
             cursor = connection.cursor()
             try:
-                cursor.execute(f"SELECT * FROM {table_name}")
+                if table_name in ["favorite_artists", "liked_songs", "subscription_info"]:
+                    cursor.execute(f"SELECT id_user FROM users WHERE username = %s", (username,))
+                    user_id = cursor.fetchone()[0]
+                    if table_name == "favorite_artists":
+                        cursor.execute(f"SELECT * FROM artist_likes WHERE id_user = %s", (user_id,))
+                    elif table_name == "liked_songs":
+                        cursor.execute(f"SELECT * FROM song_likes WHERE id_user = %s", (user_id,))
+                    elif table_name == "subscription_info":
+                        cursor.execute(f"SELECT * FROM subscriptions WHERE id_user = %s", (user_id,))
+                else:
+                    cursor.execute(f"SELECT * FROM {table_name}")
                 data = cursor.fetchall()
                 columns = [desc[0] for desc in cursor.description]
+
+                if username and "hashed_password" in columns:
+                    hashed_password_index = columns.index("hashed_password")
+                    columns.pop(hashed_password_index)
+                    for row in data:
+                        row.pop(hashed_password_index)
 
                 self.table_widget.setRowCount(len(data))
                 self.table_widget.setColumnCount(len(columns))
@@ -343,7 +381,7 @@ class DatabaseManagerApp(QWidget):
                     for col_idx, col_data in enumerate(row_data):
                         self.table_widget.setItem(row_idx, col_idx, QTableWidgetItem(str(col_data)))
             except Exception as e:
-                logging.error(f"Error loading table data: {e}")
+                logging.error(f"Error loading table data from {table_name}: {e}")
             finally:
                 cursor.close()
                 connection.close()
@@ -364,24 +402,100 @@ class DatabaseManagerApp(QWidget):
     def execute_admin_action(self, choice):
         execute_admin_action(choice)
 
-    def artist_menu(self, artist_id):
-        menu_window = QWidget()
-        menu_window.setWindowTitle("Artist Menu")
+    def artist_menu(self, username):
+        manage_window = QWidget()
+        manage_window.setWindowTitle("Artist Menu")
+        manage_window.setGeometry(100, 100, 800, 600)
         layout = QVBoxLayout()
 
-        options = [
-            "View songs", "View albums", "Add song", "Update song",
-            "Delete song", "Update album", "Delete album", "Exit"
-        ]
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(5)
 
-        for i, option in enumerate(options, 1):
-            button = QPushButton(option, menu_window)
-            button.clicked.connect(lambda _, c=i: execute_artist_action(c, artist_id))
-            layout.addWidget(button)
+        add_button = QPushButton("Add", manage_window)
+        add_button.setFixedWidth(60)
+        add_button.clicked.connect(lambda: self.add_data(self.current_table_name, skip_table_choice=True))
+        button_layout.addWidget(add_button)
 
-        menu_window.setLayout(layout)
-        menu_window.show()
-        self.menu_windows.append(menu_window)  # Keep reference
+        delete_button = QPushButton("Delete", manage_window)
+        delete_button.setFixedWidth(60)
+        delete_button.clicked.connect(lambda: self.delete_data())
+        button_layout.addWidget(delete_button)
+
+        filter_input = QLineEdit(manage_window)
+        filter_input.setPlaceholderText("Enter filter text")
+        button_layout.addWidget(filter_input)
+
+        filter_button = QPushButton("Filter", manage_window)
+        filter_button.setFixedWidth(60)
+        filter_button.clicked.connect(lambda: self.filter_data(filter_input.text()))
+        button_layout.addWidget(filter_button)
+
+        exit_button = QPushButton("Exit", manage_window)
+        exit_button.setFixedWidth(60)
+        exit_button.clicked.connect(manage_window.close)
+        button_layout.addWidget(exit_button)
+
+        layout.addLayout(button_layout)
+
+        table_layout = QHBoxLayout()
+        side_button_layout = QVBoxLayout()
+        side_button_layout.setSpacing(3)
+
+        self.table_buttons = ["songs", "albums"]
+        for table in self.table_buttons:
+            button = QPushButton(table.capitalize(), manage_window)
+            button.setFixedWidth(125)
+            button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+            button.clicked.connect(lambda _, t=table: self.load_artist_table_data(t, username))
+            side_button_layout.addWidget(button)
+
+        table_layout.addLayout(side_button_layout, 1)
+
+        self.table_widget = QTableWidget(manage_window)
+        self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table_widget.verticalHeader().setVisible(False)
+        table_layout.addWidget(self.table_widget, 4)
+
+        layout.addLayout(table_layout)
+        manage_window.setLayout(layout)
+        manage_window.show()
+        self.menu_windows.append(manage_window)
+
+        self.current_table_name = self.table_buttons[0]
+        self.load_artist_table_data(self.current_table_name, username)
+
+    def load_artist_table_data(self, table_name, username):
+        self.current_table_name = table_name
+        connection = connect_to_db()
+        if connection:
+            cursor = connection.cursor()
+            try:
+                cursor.execute("SELECT id_artist FROM artists WHERE name = %s", (username,))
+                artist_id = cursor.fetchone()[0]
+                if table_name == "songs":
+                    cursor.execute("""
+                        SELECT s.*
+                        FROM songs s
+                        JOIN albums a ON s.id_album = a.id_album
+                        WHERE a.id_artist = %s
+                    """, (artist_id,))
+                elif table_name == "albums":
+                    cursor.execute("SELECT * FROM albums WHERE id_artist = %s", (artist_id,))
+                data = cursor.fetchall()
+                columns = [desc[0] for desc in cursor.description]
+
+                self.table_widget.setRowCount(len(data))
+                self.table_widget.setColumnCount(len(columns))
+                self.table_widget.setHorizontalHeaderLabels(columns)
+                
+                for row_idx, row_data in enumerate(data):
+                    for col_idx, col_data in enumerate(row_data):
+                        self.table_widget.setItem(row_idx, col_idx, QTableWidgetItem(str(col_data)))
+            except Exception as e:
+                logging.error(f"Error loading table data: {e}")
+            finally:
+                cursor.close()
+                connection.close()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
