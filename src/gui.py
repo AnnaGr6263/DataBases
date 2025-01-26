@@ -211,7 +211,6 @@ class DatabaseManagerApp(QWidget):
         layout = QVBoxLayout()
 
         if skip_table_choice:
-            # Skip table field and forcibly use current_table_name
             current_table = table_name
         else:
             table_label = QLabel("Select table to add data:")
@@ -227,8 +226,6 @@ class DatabaseManagerApp(QWidget):
             if table_name:
                 table_combo.setCurrentText(table_name)
                 table_combo.setEnabled(False)
-
-            current_table = table_combo.currentText()
 
         self.form_layout = QFormLayout()
         layout.addLayout(self.form_layout)
@@ -256,56 +253,56 @@ class DatabaseManagerApp(QWidget):
                 self.form_layout.addRow("Name:", QLineEdit())
                 self.form_layout.addRow("Email:", QLineEdit())
                 self.form_layout.addRow("Password:", QLineEdit())
-                self.form_layout.addRow("Country:", QLineEdit())  # Changed to ask for country name
+                self.form_layout.addRow("Country:", QLineEdit())
             elif table == "genres":
                 self.form_layout.addRow("Name:", QLineEdit())
             elif table == "albums":
                 self.form_layout.addRow("Title:", QLineEdit())
                 if not skip_table_choice:
-                    self.form_layout.addRow("Artist:", QLineEdit())  # Changed to ask for artist name
-                self.form_layout.addRow("Genre:", QLineEdit())  # Changed to ask for genre name
+                    self.form_layout.addRow("Artist:", QLineEdit())
+                self.form_layout.addRow("Genre:", QLineEdit())
                 self.form_layout.addRow("Release Year:", QLineEdit())
             elif table == "songs":
                 self.form_layout.addRow("Title:", QLineEdit())
                 self.form_layout.addRow("Duration:", QLineEdit())
-                self.form_layout.addRow("Album:", QLineEdit())  # Changed to ask for album title
-                self.form_layout.addRow("Genre:", QLineEdit())  # Changed to ask for genre name
+                self.form_layout.addRow("Album:", QLineEdit())
+                self.form_layout.addRow("Genre:", QLineEdit())
             elif table == "playlists":
                 self.form_layout.addRow("Name:", QLineEdit())
-                self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
+                self.form_layout.addRow("User:", QLineEdit())
                 self.form_layout.addRow("Is Public:", QLineEdit())
             elif table == "playlist_songs":
-                self.form_layout.addRow("Playlist:", QLineEdit())  # Changed to ask for playlist name
-                self.form_layout.addRow("Song:", QLineEdit())  # Changed to ask for song title
+                self.form_layout.addRow("Playlist:", QLineEdit())
+                self.form_layout.addRow("Song:", QLineEdit())
             elif table == "subscriptions":
-                self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
+                self.form_layout.addRow("User:", QLineEdit())
                 self.form_layout.addRow("Start Date:", QLineEdit())
                 self.form_layout.addRow("End Date:", QLineEdit())
             elif table == "song_stats":
-                self.form_layout.addRow("Song:", QLineEdit())  # Changed to ask for song title
+                self.form_layout.addRow("Song:", QLineEdit())
                 self.form_layout.addRow("Play Count:", QLineEdit())
                 self.form_layout.addRow("Last Played:", QLineEdit())
             elif table == "song_likes":
-                self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
-                self.form_layout.addRow("Song:", QLineEdit())  # Changed to ask for song title
+                self.form_layout.addRow("User:", QLineEdit())
+                self.form_layout.addRow("Song:", QLineEdit())
             elif table == "album_likes":
-                self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
-                self.form_layout.addRow("Album:", QLineEdit())  # Changed to ask for album title
+                self.form_layout.addRow("User:", QLineEdit())
+                self.form_layout.addRow("Album:", QLineEdit())
             elif table == "artist_likes":
-                self.form_layout.addRow("User:", QLineEdit())  # Changed to ask for username
-                self.form_layout.addRow("Artist:", QLineEdit())  # Changed to ask for artist name
+                self.form_layout.addRow("User:", QLineEdit())
+                self.form_layout.addRow("Artist:", QLineEdit())
             elif table == "admin_created_playlists":
-                self.form_layout.addRow("Playlist:", QLineEdit())  # Changed to ask for playlist name
-                self.form_layout.addRow("Admin:", QLineEdit())  # Changed to ask for admin username
+                self.form_layout.addRow("Playlist:", QLineEdit())
+                self.form_layout.addRow("Admin:", QLineEdit())
 
         if not skip_table_choice:
-            table_combo.currentTextChanged.connect(update_form_fields)
+            table_combo.currentTextChanged.connect(lambda: update_form_fields(table_combo.currentText()))
             update_form_fields(table_combo.currentText())
         else:
             update_form_fields(current_table)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        button_box.accepted.connect(lambda: self.submit_add_data(current_table, self.form_layout))
+        button_box.accepted.connect(lambda: self.submit_add_data(table_combo.currentText() if not skip_table_choice else current_table, self.form_layout))
         button_box.rejected.connect(add_dialog.reject)
         layout.addWidget(button_box)
 
@@ -325,7 +322,6 @@ class DatabaseManagerApp(QWidget):
                     value = hash_password(value)
                 data[label] = value
 
-        # If artist is adding data for "albums" or "songs" and the form has no "Artist", fill it automatically
         if table_name in ["albums", "songs"] and "Artist" not in data:
             data["Artist"] = self.username_entry.text()
 
@@ -346,6 +342,60 @@ class DatabaseManagerApp(QWidget):
 
         execute_admin_action("4", table_name, record_id)
         self.load_table_data(table_name)
+
+    def replace_foreign_keys_with_names(self, table_name, data):
+        connection = connect_to_db()
+        if connection:
+            cursor = connection.cursor()
+            try:
+                if table_name == "artists":
+                    for i, row in enumerate(data):
+                        row = list(row)  # Convert tuple to list
+                        country_id = row[4]  # Assuming the country_id is at index 4
+                        cursor.execute("SELECT name FROM countries WHERE id_country = %s", (country_id,))
+                        result = cursor.fetchone()
+                        if result:
+                            country_name = result[0]
+                            row[4] = country_name
+                        data[i] = tuple(row)  # Convert list back to tuple
+                elif table_name == "songs":
+                    for i, row in enumerate(data):
+                        row = list(row)  # Convert tuple to list
+                        album_id = row[3]  # Assuming the album_id is at index 3
+                        genre_id = row[4]  # Assuming the genre_id is at index 4
+                        cursor.execute("SELECT title FROM albums WHERE id_album = %s", (album_id,))
+                        result = cursor.fetchone()
+                        if result:
+                            album_title = result[0]
+                            row[3] = album_title
+                        cursor.execute("SELECT name FROM genres WHERE id_genre = %s", (genre_id,))
+                        result = cursor.fetchone()
+                        if result:
+                            genre_name = result[0]
+                            row[4] = genre_name
+                        data[i] = tuple(row)  # Convert list back to tuple
+                elif table_name == "albums":
+                    for i, row in enumerate(data):
+                        row = list(row)  # Convert tuple to list
+                        artist_id = row[2]  # Assuming the artist_id is at index 2
+                        genre_id = row[3]  # Assuming the genre_id is at index 3
+                        cursor.execute("SELECT name FROM artists WHERE id_artist = %s", (artist_id,))
+                        result = cursor.fetchone()
+                        if result:
+                            artist_name = result[0]
+                            row[2] = artist_name
+                        cursor.execute("SELECT name FROM genres WHERE id_genre = %s", (genre_id,))
+                        result = cursor.fetchone()
+                        if result:
+                            genre_name = result[0]
+                            row[3] = genre_name
+                        data[i] = tuple(row)  # Convert list back to tuple
+                # Add more cases as needed for other tables
+            except Exception as e:
+                logging.error(f"Error replacing foreign keys with names: {e}")
+            finally:
+                cursor.close()
+                connection.close()
 
     def load_table_data(self, table_name, username=None):
         self.current_table_name = table_name  # Store the current table name
@@ -370,8 +420,12 @@ class DatabaseManagerApp(QWidget):
                 if username and "hashed_password" in columns:
                     hashed_password_index = columns.index("hashed_password")
                     columns.pop(hashed_password_index)
-                    for row in data:
+                    for i, row in enumerate(data):
+                        row = list(row)
                         row.pop(hashed_password_index)
+                        data[i] = tuple(row)
+
+                self.replace_foreign_keys_with_names(table_name, data)
 
                 self.table_widget.setRowCount(len(data))
                 self.table_widget.setColumnCount(len(columns))
@@ -387,8 +441,35 @@ class DatabaseManagerApp(QWidget):
                 connection.close()
 
     def filter_data(self, filter_text):
-        # TODO: Implement filter_data functionality
-        pass
+        if not filter_text:
+            self.load_table_data(self.current_table_name)  # Reload the original data if filter text is empty
+            return
+
+        connection = connect_to_db()
+        if connection:
+            cursor = connection.cursor()
+            try:
+                header_labels = [self.table_widget.horizontalHeaderItem(i).text() for i in range(self.table_widget.columnCount())]
+                query = f"SELECT * FROM {self.current_table_name} WHERE "
+                query += " OR ".join([f"{col} LIKE %s" for col in header_labels])
+                cursor.execute(query, [f"%{filter_text}%"] * len(header_labels))
+                data = cursor.fetchall()
+                columns = [desc[0] for desc in cursor.description]
+
+                self.replace_foreign_keys_with_names(self.current_table_name, data)
+
+                self.table_widget.setRowCount(len(data))
+                self.table_widget.setColumnCount(len(columns))
+                self.table_widget.setHorizontalHeaderLabels(columns)
+
+                for row_idx, row_data in enumerate(data):
+                    for col_idx, col_data in enumerate(row_data):
+                        self.table_widget.setItem(row_idx, col_idx, QTableWidgetItem(str(col_data)))
+            except Exception as e:
+                logging.error(f"Error filtering table data: {e}")
+            finally:
+                cursor.close()
+                connection.close()
 
     def check_likes(self):
         entity, ok = QInputDialog.getText(self, "Input", "Enter type (song/album/artist):")
@@ -483,6 +564,8 @@ class DatabaseManagerApp(QWidget):
                     cursor.execute("SELECT * FROM albums WHERE id_artist = %s", (artist_id,))
                 data = cursor.fetchall()
                 columns = [desc[0] for desc in cursor.description]
+
+                self.replace_foreign_keys_with_names(table_name, data)
 
                 self.table_widget.setRowCount(len(data))
                 self.table_widget.setColumnCount(len(columns))
