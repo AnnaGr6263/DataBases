@@ -1,4 +1,7 @@
-# Projekt bazy danych dla aplikacji muzycznej w stylu Spotify - Sprawozdanie z realizacji projektu
+# Projekt bazy danych (Spotifydb) dla aplikacji muzycznej 
+## Sprawozdanie z realizacji projektu
+### Anna Grelewska Marcel Musiałek
+
 
 ## 1. Spis treści
 
@@ -13,7 +16,7 @@
   - [8. Dodawanie tabel](#8-dodawanie-tabel)
 
 ## 2. Wstęp
-Celem niniejszego projektu jest zaprojektowanie oraz implementacja relacyjnej bazy danych dla aplikacji muzycznej, umożliwiającej użytkownikom streamowanie utworów, tworzenie własnych playlist, polubienie utworów i artystów.
+Celem niniejszego projektu jest zaprojektowanie oraz implementacja relacyjnej bazy danych dla aplikacji muzycznej, umożliwiającej użytkownikom streamowanie utworów, tworzenie własnych playlist, polubienie utworów, albumów i artystów. W projekcie skupimy się na zaprojektowaniu struktury bazy danych w MariaDB.
 
 ## 3. Analiza wymagań dla bazy danych aplikacji muzycznej
 
@@ -24,17 +27,17 @@ Celem niniejszego projektu jest zaprojektowanie oraz implementacja relacyjnej ba
   - Zapewnienie transakcyjności dla operacji kluczowych (np. dodawanie utworów, tworzenie playlist).
   - Informacja o subskrypcjach użytkowników – przechowywanie planów płatnych.
   - Wyszukiwanie utworów na podstawie tytułu, albumu, artysty i gatunku.
-  - Statystyki odtwarzania utworów – rejestrowanie liczby odsłuchań.
+  - Statystyki odtwarzania utworów.
   - Zarządzanie ulubionymi artystami i piosenkami.
+
 
 ### 3.2. Ograniczenia projektu
 - Baza danych działa w MariaDB.
 - Nie przechowujemy plików audio – baza danych zawiera tylko metadane utworów.
-- Aplikacja w Pythonie lub Javie – baza musi zapewniać wygodny dostęp poprzez SQL (np. JDBC dla Javy lub SQLAlchemy dla Pythona).
+- Aplikacja w Pythonie – baza musi zapewniać wygodny dostęp poprzez SQL.
 
----
 
-## 4. Model dziedziny i słowniki pojęciowe
+### 3.3. Model dziedziny i słowniki pojęciowe
 | **Pojęcie dziedzinowe** | **Encja w bazie** | **Opis** |  
 |----------------------|----------------|----------------|  
 | **Użytkownik** | `Users` | Reprezentuje osoby korzystające z aplikacji. |  
@@ -51,21 +54,42 @@ Celem niniejszego projektu jest zaprojektowanie oraz implementacja relacyjnej ba
 
 ---
 
-## 5. Modelowanie bazy danych
-(Tutaj treść sekcji Modelowanie bazy danych)
+## 4. Modelowanie bazy danych
 
-### 5.1. Model konceptualny
-Model konceptualny przedstawia główne encje i relacje bez uwzględnienia detali technicznych.
+### 4.1. Model konceptualny
 
 - Użytkownicy (Users) mogą posiadać playlisty (Playlists), dodawać utwory do ulubionych oraz polubić różne elementy (Likes).
 - Artyści (Artists) publikują albumy (Albums), które zawierają utwory (Songs) przypisane do określonego gatunku (Genres).
 - Utwory (Songs) mogą być dodawane do playlist (Playlist_Songs) i śledzone pod kątem statystyk (Song_Stats).
 - Użytkownicy mogą ulubionych artystów (Favorite_Artists).
 
-### 5.2. Model logiczny
-- todo
+### 4.2. Model logiczny
+### 4.2.1 Dostępność i uprawnienia
+#### Uprawnienia w aplikacji
 
-## 6. Tabele
+| **Funkcjonalność**            | **Priorytet** | **Administrator**       | **Artysta**                       | **Użytkownik**                 | **Uzasadnienie** |
+|------------------------------|--------------|-------------------------|-----------------------------------|-------------------------------|------------------|
+| **CRUD na użytkownikach**     | Wysoki       | ✅ Pełen dostęp          | ❌ Brak dostępu                    | ❌ Brak dostępu                | Niezbędne do zarządzania kontami |
+| **CRUD na utworach**         | Wysoki       | ✅ Pełen dostęp          | ✅ Dodawanie/edycja (tylko własne) | ❌ Brak dostępu                | Podstawa funkcjonowania aplikacji |
+| **CRUD na albumach**         | Wysoki       | ✅ Pełen dostęp          | ✅ Dodawanie/edycja (tylko własne) | ❌ Brak dostępu                | Albumy muszą być zarządzane przez artystów |
+| **CRUD na playlistach**      | Średni       | ✅ Pełen dostęp          | ❌ Brak dostępu                    | ✅ Pełen dostęp                | Playlisty zwiększają komfort użytkowania |
+| **Odtwarzanie utworów**      | Wysoki       | ✅ Tak                   | ❌ Brak dostępu                    | ✅ Tak                         | Kluczowa funkcjonalność aplikacji |
+| **Polubienia (utwory, albumy, artyści)** | Średni | ✅ Tak | ❌ Brak dostępu                    | ✅ Tak | Personalizacja treści |
+| **Zarządzanie subskrypcjami** | Wysoki       | ✅ Tak                   | ❌ Brak dostępu                    | ✅ Tylko własna subskrypcja    | Kluczowe dla modelu biznesowego |
+| **Statystyki odtwarzania**   | Średni       | ✅ Pełen dostęp          | ✅ Tylko własne utwory (SELECT)    | ❌ Brak dostępu                | Przydatne dla artystów do analizy popularności |
+| **Wyszukiwanie utworów**     | Wysoki       | ✅ Pełen dostęp          | ❌ Brak dostępu                    | ✅ Tak                         | Ułatwia dostęp do treści |
+
+W aplikacji dostępne są trzy typydostępu: użytkownik, artysta i administrator.
+
+**Użytkownik** to osoba, która chce korzystać z aplikacji, ale musi posiadać aktywną, płatną subskrypcję – nie przewidujemy darmowego okresu próbnego ani wersji demo. 
+
+**Artysta** nie jest użytkownikiem – jego konto służy wyłącznie do zarządzania własnymi treściami, takimi jak muzyka czy albumy. Jeśli artysta chce korzystać z aplikacji jak zwykły użytkownik (np. słuchać muzyki), musi założyć osobne konto użytkownika i wykupić subskrypcję na tych samych zasadach, co inni. 
+
+**Administrator** to pracownik firmy zarządzającej aplikacją, odpowiedzialny za nadzorowanie systemu i dbanie o prawidłowe działanie usług.
+
+
+
+### 4.2.2. Tabele
 
 <details>
 <summary><strong>1. Tabela Users</strong></summary>
@@ -225,7 +249,15 @@ Model konceptualny przedstawia główne encje i relacje bez uwzględnienia detal
 
 </details>
 
-## 7. Normalizacja
+<details>
+<summary><strong>10. Zmiany</strong></summary>
+
+Usunięcie kolumny genre_id z tabeli Artists
+Teraz Genres odnosi się tylko do Songs
+
+</details>
+
+### 4.2.3. Normalizacja
 
 
 <details>
@@ -337,7 +369,7 @@ Model konceptualny przedstawia główne encje i relacje bez uwzględnienia detal
 
 ![Diagram po normalizacji](diagrams/diagram_po_normalizacji.png)
 
-## 8. Dodawanie tabel
+## 4.3. Dodawanie tabel
 <details> 
 <summary><strong>Kwerendy dodawania tabel</strong></summary>
 
@@ -700,4 +732,25 @@ EXECUTE FUNCTION check_artist_ownership();
 REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA spotifydb FROM PUBLIC;
 ```
 
+</details>
+
+<details> 
+<summary><strong>Triggery</strong></summary>
+
+Trigger after_user_insert został dodany, aby automatycznie utworzyć subskrypcję dla nowego użytkownika po dodaniu go do tabeli users. Po wstawieniu nowego rekordu w users, trigger oblicza datę końca subskrypcji jako 3 miesiące od daty utworzenia konta i dodaje nowy wpis do tabeli subscriptions. Dzięki temu eliminuje potrzebę ręcznego dodawania subskrypcji dla nowych użytkowników, automatyzując proces. Założyliśmy, że wszyscy użytkownicy którzy chcą korzystać z aplikacji muszą mieć wykupioną subskrypcję.
+
+```sql
+DELIMITER //
+          
+CREATE TRIGGER after_user_insert
+AFTER INSERT ON users
+FOR EACH ROW
+BEGIN
+   DECLARE end_date DATE;
+   SET end_date = DATE_ADD(NEW.date_created, INTERVAL 3 MONTH);
+   INSERT INTO subscriptions (id_user, start_date, end_date) VALUES (NEW.id_user, NEW.date_created, end_date);
+END //
+    
+DELIMITER ;
+```
 </details>
