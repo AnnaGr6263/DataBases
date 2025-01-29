@@ -211,6 +211,48 @@ CREATE TABLE admin_created_playlists (
 )ENGINE=InnoDB;
 
 
+-- 🟢 Tworzenie użytkowników
+CREATE USER IF NOT EXISTS 'artistdb'@'localhost' IDENTIFIED BY 'artistpassword';
+CREATE USER IF NOT EXISTS 'userdb'@'localhost' IDENTIFIED BY 'userpassword';
+
+-- 🟢 Nadawanie podstawowego dostępu do MySQL (bez niego mogą nie mieć dostępu)
+GRANT USAGE ON *.* TO 'artistdb'@'localhost';
+GRANT USAGE ON *.* TO 'userdb'@'localhost';
+
+-- 🟢 Upewnienie się, że użytkownicy mogą widzieć bazę danych
+GRANT ALL PRIVILEGES ON spotifydb.* TO 'artistdb'@'localhost';
+GRANT ALL PRIVILEGES ON spotifydb.* TO 'userdb'@'localhost';
+
+-- 🔵 Tworzenie ról
+CREATE ROLE IF NOT EXISTS artist;
+CREATE ROLE IF NOT EXISTS user;
+
+-- 🟠 Uprawnienia dla roli ARTIST (artyści mogą zarządzać TYLKO SWOIMI albumami i utworami)
+GRANT SELECT, INSERT, DELETE, UPDATE ON spotifydb.albums TO artist;
+GRANT SELECT, INSERT, DELETE, UPDATE ON spotifydb.songs TO artist;
+GRANT SELECT ON spotifydb.song_stats TO artist;  -- Artyści mogą tylko przeglądać statystyki
+
+-- 🟡 Uprawnienia dla roli USER (użytkownicy mogą odtwarzać muzykę i zarządzać polubieniami)
+GRANT SELECT ON spotifydb.songs TO user;
+GRANT SELECT ON spotifydb.albums TO user;
+GRANT SELECT ON spotifydb.artists TO user;
+GRANT SELECT, INSERT, DELETE ON spotifydb.playlists TO user;
+GRANT SELECT, INSERT, DELETE ON spotifydb.song_likes TO user;
+GRANT SELECT, INSERT, DELETE ON spotifydb.album_likes TO user;
+GRANT SELECT, INSERT, DELETE ON spotifydb.artist_likes TO user;
+GRANT SELECT, INSERT, DELETE ON spotifydb.subscriptions TO user;
+
+-- 🟢 Przypisanie ról do użytkowników
+GRANT artist TO 'artistdb'@'localhost';
+GRANT user TO 'userdb'@'localhost';
+
+-- 🔴 Root ma pełne uprawnienia (upewniamy się, że root jest adminem)
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+
+-- 🔄 Odświeżenie uprawnień
+FLUSH PRIVILEGES;
+
+
 DELIMITER //
 
 CREATE TRIGGER after_user_insert
