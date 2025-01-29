@@ -344,7 +344,7 @@ class DatabaseManagerApp(QWidget):
         self.load_table_data(table_name)
 
     def replace_foreign_keys_with_names(self, table_name, data):
-        connection = connect_to_db()
+        connection = connect_to_db(role="readonly")
         if connection:
             cursor = connection.cursor()
             try:
@@ -399,7 +399,7 @@ class DatabaseManagerApp(QWidget):
 
     def load_table_data(self, table_name, username=None):
         self.current_table_name = table_name  # Store the current table name
-        connection = connect_to_db()
+        connection = connect_to_db(role="readonly")
         if connection:
             cursor = connection.cursor()
             try:
@@ -445,7 +445,7 @@ class DatabaseManagerApp(QWidget):
             self.load_table_data(self.current_table_name)  # Reload the original data if filter text is empty
             return
 
-        connection = connect_to_db()
+        connection = connect_to_db(role="readonly")
         if connection:
             cursor = connection.cursor()
             try:
@@ -547,7 +547,7 @@ class DatabaseManagerApp(QWidget):
 
     def load_artist_table_data(self, table_name, username):
         self.current_table_name = table_name
-        connection = connect_to_db()
+        connection = connect_to_db(role="artist")
         if connection:
             cursor = connection.cursor()
             try:

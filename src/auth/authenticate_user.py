@@ -4,7 +4,7 @@ import bcrypt
 import logging
 
 def authenticate_user(username, password, user_type='user'):
-    connection = connect_to_db()
+    connection = connect_to_db(role=user_type)
     if connection:
         cursor = connection.cursor()
         try:

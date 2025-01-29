@@ -4,7 +4,7 @@ from auth.encryption import hash_password  # Add this import
 
 def create_indexes():
     # Tworzy indeksy w bazie dla szybszego wyszukiwania.
-    connection = connect_to_db()
+    connection = connect_to_db(role="admin")
     if connection:
         cursor = connection.cursor()
         try:
@@ -21,7 +21,7 @@ def create_indexes():
 
 def create_like_count_functions():
     # Tworzy funkcje SQL do liczenia polubień dla utworów, albumów i artystów.
-    connection = connect_to_db()
+    connection = connect_to_db(role="admin")
     if connection:
         cursor = connection.cursor()
         try:
@@ -66,7 +66,7 @@ def setup_database():
     create_indexes()
     create_like_count_functions()
     
-    conn = connect_to_db()
+    conn = connect_to_db(role="admin")
     cursor = conn.cursor()
     try:
         # Check if the first admin exists

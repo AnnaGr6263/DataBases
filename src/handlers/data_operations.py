@@ -2,7 +2,7 @@ import logging
 from db.connect_db import connect_to_db
 
 def fetch_data(table_name):
-    connection = connect_to_db()
+    connection = connect_to_db(role="readonly")
     if connection:
         cursor = connection.cursor(dictionary=True)
         try:
@@ -25,7 +25,7 @@ def get_singular_form(table_name):
     return table_name
 
 def get_or_create_id(table_name, column_name, value, additional_data=None):
-    connection = connect_to_db()
+    connection = connect_to_db(role="admin")
     if connection:
         cursor = connection.cursor()
         try:
@@ -53,7 +53,7 @@ def get_or_create_id(table_name, column_name, value, additional_data=None):
             connection.close()
 
 def add_data(table_name, data):
-    connection = connect_to_db()
+    connection = connect_to_db(role="admin")
     if connection:
         cursor = connection.cursor()
         try:
@@ -94,7 +94,7 @@ def add_data(table_name, data):
             connection.close()
 
 def update_data(table_name, record_id, data):
-    connection = connect_to_db()
+    connection = connect_to_db(role="admin")
     if connection:
         cursor = connection.cursor()
         set_clause = ', '.join([f"{key} = %s" for key in data.keys()])
@@ -106,7 +106,7 @@ def update_data(table_name, record_id, data):
         logging.info(f"Data in {table_name} updated successfully.")
 
 def delete_data(table_name, record_id):
-    connection = connect_to_db()
+    connection = connect_to_db(role="admin")
     if connection:
         cursor = connection.cursor()
         try:
@@ -123,7 +123,7 @@ def delete_data(table_name, record_id):
 
 def get_like_count(entity_type, entity_id):
     # Zwraca liczbę polubień dla utworu, albumu lub artysty.
-    connection = connect_to_db()
+    connection = connect_to_db(role="readonly")
     if connection:
         cursor = connection.cursor()
         try:
